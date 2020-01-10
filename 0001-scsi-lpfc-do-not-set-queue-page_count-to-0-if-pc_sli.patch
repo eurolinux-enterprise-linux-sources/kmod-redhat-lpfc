@@ -1,0 +1,62 @@
+From dcbc5d3d77900ee102eaa90124c04eacca942000 Mon Sep 17 00:00:00 2001
+From: Ewan Milne <emilne@redhat.com>
+Date: Wed, 19 Dec 2018 18:06:47 +0100
+Subject: [PATCH] [scsi] lpfc: do not set queue->page_count to 0 if
+ pc_sli4_params.wqpcnt is invalid
+
+Message-id: <20181219180647.30938-1-emilne@redhat.com>
+Patchwork-id: 236215
+O-Subject: [RHEL7.7 PATCH e-stor] scsi: lpfc: do not set queue->page_count to 0 if pc_sli4_params.wqpcnt is invalid
+Bugzilla: 1657981
+Z-Bugzilla: 1664067
+RH-Acked-by: Charles Haithcock <chaithco@redhat.com>
+RH-Acked-by: John Pittman <jpittman@redhat.com>
+RH-Acked-by: Laurence Oberman <loberman@redhat.com>
+
+Bugzilla: 1657981
+Upstream Status: From upstream linux-scsi branch "4.21/scsi-queue" of
+	 	 git://git.kernel.org/pub/scm/linux/kernel/git/mkp/scsi.git
+Brew: 19582271
+Tested: Tested by Laurence Oberman and Ewan D. Milne on all available Broadcom adapters
+        as well as at customer site
+
+commit 4e87eb2f46ea547d12a276b2e696ab934d16cfb6
+Author: Ewan D. Milne <emilne@redhat.com>
+Date:   Thu Dec 13 15:25:16 2018 -0500
+
+    scsi: lpfc: do not set queue->page_count to 0 if pc_sli4_params.wqpcnt is invalid
+
+    Certain older adapters such as the OneConnect OCe10100 may not have a valid
+    wqpcnt value.  In this case, do not set queue->page_count to 0 in
+    lpfc_sli4_queue_alloc() as this will prevent the driver from initializing.
+
+    Fixes: 895427bd01 ("scsi: lpfc: NVME Initiator: Base modifications")
+    Cc: stable@vger.kernel.org # 4.11+
+    Signed-off-by: Ewan D. Milne <emilne@redhat.com>
+    Reviewed-by: Laurence Oberman <loberman@redhat.com>
+    Tested-by:   Laurence Oberman <loberman@redhat.com>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+
+Signed-off-by: Ewan D. Milne <emilne@redhat.com>
+Signed-off-by: Jan Stancek <jstancek@redhat.com>
+---
+ drivers/scsi/lpfc/lpfc_sli.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/scsi/lpfc/lpfc_sli.c b/drivers/scsi/lpfc/lpfc_sli.c
+index d26c79698d9e..d0b70d86beb0 100644
+--- a/drivers/scsi/lpfc/lpfc_sli.c
++++ b/drivers/scsi/lpfc/lpfc_sli.c
+@@ -14157,7 +14157,8 @@ lpfc_sli4_queue_alloc(struct lpfc_hba *phba, uint32_t page_size,
+ 			hw_page_size))/hw_page_size;
+ 
+ 	/* If needed, Adjust page count to match the max the adapter supports */
+-	if (queue->page_count > phba->sli4_hba.pc_sli4_params.wqpcnt)
++	if (phba->sli4_hba.pc_sli4_params.wqpcnt &&
++	    (queue->page_count > phba->sli4_hba.pc_sli4_params.wqpcnt))
+ 		queue->page_count = phba->sli4_hba.pc_sli4_params.wqpcnt;
+ 
+ 	INIT_LIST_HEAD(&queue->list);
+-- 
+2.13.6
+

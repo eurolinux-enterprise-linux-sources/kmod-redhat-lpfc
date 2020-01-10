@@ -1,0 +1,13 @@
+Index: src/drivers/scsi/lpfc/lpfc_version.h
+===================================================================
+--- src.orig/drivers/scsi/lpfc/lpfc_version.h	2019-01-23 10:10:39.944605061 +0100
++++ src/drivers/scsi/lpfc/lpfc_version.h	2019-01-23 10:15:30.633595334 +0100
+@@ -20,7 +20,7 @@
+  * included with this package.                                     *
+  *******************************************************************/
+ 
+-#define LPFC_DRIVER_VERSION "12.0.0.5"
++#define LPFC_DRIVER_VERSION "12.0.0.5_dup7.6"
+ #define LPFC_DRIVER_NAME		"lpfc"
+ 
+ /* Used for SLI 2/3 */
